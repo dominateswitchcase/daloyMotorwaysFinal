@@ -564,19 +564,19 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4633935075609510868, guid: b4153422cdbfd2c4a815799574a48ab1, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.56
+      value: 10.56
       objectReference: {fileID: 0}
     - target: {fileID: 4633935075609510868, guid: b4153422cdbfd2c4a815799574a48ab1, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 1.1800003
+      value: 3.1800003
       objectReference: {fileID: 0}
     - target: {fileID: 4633935075609510868, guid: b4153422cdbfd2c4a815799574a48ab1, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8433914
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 4633935075609510868, guid: b4153422cdbfd2c4a815799574a48ab1, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.53729963
+      value: 0.7071068
       objectReference: {fileID: 0}
     - target: {fileID: 4633935075609510868, guid: b4153422cdbfd2c4a815799574a48ab1, type: 3}
       propertyPath: m_LocalRotation.y
@@ -993,7 +993,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 59216addf58d9434ca449deaa09930bd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimeManager
-  dayLength: 360
+  dayLength: 30
   startHour: 5
   endHour: 22
 --- !u!4 &2043104421
