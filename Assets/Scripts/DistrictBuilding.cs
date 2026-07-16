@@ -20,8 +20,13 @@ public class DistrictBuilding : MonoBehaviour
     public bool isDemandingShed = false;
     private Color buildingColor;
 
+    
+    // [Header("Game Over Panel")]
+    // public UIAutoAnimation GameOverPanel;
+
     void Start()
     {
+        Debug.Log($"Script is attached to: {gameObject.name}", gameObject); 
         currentTimer = dangerTimer;
 
         buildingColor = new Color(Random.Range(0f, 1f), Random.Range(0f, 1f), Random.Range(0f, 1f));
@@ -72,6 +77,7 @@ public class DistrictBuilding : MonoBehaviour
             }
 
             if (currentTimer <= 0) GameOver();
+            // if (currentTimer <= 40f) GameOver();
         }
         else
         {
@@ -157,7 +163,17 @@ public class DistrictBuilding : MonoBehaviour
     void GameOver()
     {
         Debug.Log("GAME OVER! A building was left without a shed.");
+        
+        // GameOverPanel.GetComponent<PopupManager>().ShowPopup();
+        // GameOverPanel.EntranceAnimation();
         Time.timeScale = 0f;
+
+        // // GameOverPanel.ShowPopup();
+        // GameOverPanel.GetComponent<PopupManager>().ShowPopup();
+        // GameOverPanel.EntranceAnimation();
+
+
+
     }
 
     void OnDrawGizmosSelected()
