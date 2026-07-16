@@ -18,16 +18,17 @@ public class TimeManager : MonoBehaviour
         return Mathf.InverseLerp(startHour, endHour, hour);
     }
 
-// ***
+    // For UI ***
     public List<Image> NightIcons = new List<Image>();
     public UIAutoAnimation TextToBeShown; 
     private bool fiveAMTriggered = false;
-///***
+
+    // ****
+
     private float timer;
 
     private void Awake()
     {
-        // TextToBeShown.EntranceAnimation();
         if (Instance == null)
             Instance = this;
         else
@@ -49,6 +50,7 @@ public class TimeManager : MonoBehaviour
             fiveAMTriggered = true;
             StartCoroutine(PlayDayPopUpTransition());
         }
+
 
         if (CurrentHour >= endHour)
         {
@@ -92,12 +94,7 @@ public class TimeManager : MonoBehaviour
             return 3; // Night
     }
 
-    public string GetFormattedTime()
-    {
-        int hours = Mathf.FloorToInt(CurrentHour);
-        int minutes = Mathf.FloorToInt((CurrentHour - hours) * 60f);
-        return $"{hours:00}:{minutes:00}";
-    }
+
 
     void EndDay()
     {
