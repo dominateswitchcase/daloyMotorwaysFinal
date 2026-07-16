@@ -3,12 +3,12 @@ using UnityEngine;
 
 public class RouteBuilder : MonoBehaviour
 {
-
     public static RouteBuilder Instance;
 
-    public List<WaitingShed> currentStops = new();
+    // Selected nodes
+    public List<RoadNode> currentStops = new();
 
-    // We'll fill this after A* works
+    // Final road path
     public List<RoadSegment> currentPath = new();
 
     public RoutePreview preview;
@@ -28,9 +28,11 @@ public class RouteBuilder : MonoBehaviour
         preview.Clear();
 
         isDrawing = true;
+
+        Debug.Log("Started Route");
     }
 
-    public void AddStop(WaitingShed stop)
+    public void AddStop(RoadNode stop)
     {
         Debug.Log("Clicked: " + stop.name);
 
@@ -42,25 +44,23 @@ public class RouteBuilder : MonoBehaviour
 
         if (currentStops.Contains(stop))
         {
-            Debug.Log("Stop already added.");
+            Debug.Log("Node already added.");
             return;
         }
 
         currentStops.Add(stop);
 
-        Debug.Log("Current Stops: " + currentStops.Count);
+        Debug.Log("Current Nodes: " + currentStops.Count);
 
+        // Once two nodes exist, find the road path between them
         if (currentStops.Count >= 2)
         {
-            WaitingShed previous = currentStops[currentStops.Count - 2];
+            RoadNode previous = currentStops[currentStops.Count - 2];
 
-            Debug.Log("Finding path from "
-                + previous.roadNode.name
-                + " to "
-                + stop.roadNode.name);
+            Debug.Log($"Finding path from {previous.name} to {stop.name}");
 
             List<RoadSegment> section =
-                Pathfinder.FindPath(previous.roadNode, stop.roadNode);
+                Pathfinder.FindPath(previous, stop);
 
             Debug.Log("Roads Found: " + section.Count);
 
@@ -76,7 +76,7 @@ public class RouteBuilder : MonoBehaviour
             preview.DrawPath(currentPath);
         }
 
-        Debug.Log("Added Stop: " + stop.name);
+        Debug.Log("Added Node: " + stop.name);
     }
 
     public void FinishRoute()
@@ -85,14 +85,13 @@ public class RouteBuilder : MonoBehaviour
 
         Debug.Log("Route Complete!");
 
-        foreach (WaitingShed stop in currentStops)
+        foreach (RoadNode node in currentStops)
         {
-            Debug.Log(stop.name);
+            Debug.Log(node.name);
         }
 
         // Later:
-        // Create JeepRoute
-        // Run Pathfinder
+        // Save Route
         // Spawn Jeep
     }
 
@@ -104,5 +103,7 @@ public class RouteBuilder : MonoBehaviour
         preview.Clear();
 
         isDrawing = false;
+
+        Debug.Log("Route Cancelled");
     }
 }
