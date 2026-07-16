@@ -1,18 +1,7 @@
-using UnityEngine;
+using System.Collections.Generic;
 
-public class RoadNodeClick : MonoBehaviour
+[System.Serializable]
+public class Route
 {
-    private void OnMouseDown()
-    {
-        Debug.Log("Clicked Node: " + gameObject.name);
-
-        if (RouteBuilder.Instance != null)
-        {
-            RouteBuilder.Instance.AddStop(GetComponent<RoadNode>());
-        }
-        else
-        {
-            Debug.LogError("RouteBuilder.Instance is NULL");
-        }
-    }
+    public List<WaitingShed> stops = new();
 }
