@@ -132,7 +132,7 @@ public class CameraTopViewSwitcher : MonoBehaviour
         if (elapsed >= transitionDuration)
         {
             // SCENE CHANGE
-            SceneManager.LoadScene("camera testing");
+            SceneManager.LoadScene("Game");
         }
     }
 

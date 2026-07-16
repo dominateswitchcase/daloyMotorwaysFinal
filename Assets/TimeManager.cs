@@ -24,6 +24,7 @@ public class TimeManager : MonoBehaviour
     [Header("Day / Night UI")]
     public List<Image> NightIcons = new List<Image>();
     public UIAutoAnimation TextToBeShown;
+    public TextMeshProUGUI TextToBeShownText;
 
     public float CurrentHour { get; private set; }
 
@@ -149,6 +150,7 @@ public class TimeManager : MonoBehaviour
     {
         if (TextToBeShown != null)
         {
+            TextToBeShownText.text = $"Day {currentDay}";
             TextToBeShown.EntranceAnimation();
 
             yield return new WaitForSeconds(1.6f);
