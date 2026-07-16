@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class RouteBuilder : MonoBehaviour
 {
@@ -106,4 +107,23 @@ public class RouteBuilder : MonoBehaviour
 
         Debug.Log("Route Cancelled");
     }
+
+    private void Update()
+    {
+        if (Keyboard.current.rKey.wasPressedThisFrame)
+        {
+            BeginRoute();
+        }
+
+        if (Keyboard.current.enterKey.wasPressedThisFrame)
+        {
+            FinishRoute();
+        }
+
+        if (Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            CancelRoute();
+        }
+    }
 }
+
