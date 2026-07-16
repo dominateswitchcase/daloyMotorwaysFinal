@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections.Generic;
 
 public class TimeManager : MonoBehaviour
 {
@@ -16,10 +18,16 @@ public class TimeManager : MonoBehaviour
         return Mathf.InverseLerp(startHour, endHour, hour);
     }
 
+// ***
+    public List<Image> NightIcons = new List<Image>();
+    public UIAutoAnimation TextToBeShown; 
+    private bool fiveAMTriggered = false;
+///***
     private float timer;
 
     private void Awake()
     {
+        // TextToBeShown.EntranceAnimation();
         if (Instance == null)
             Instance = this;
         else
@@ -34,10 +42,61 @@ public class TimeManager : MonoBehaviour
 
         CurrentHour = Mathf.Lerp(startHour, endHour, t);
 
+        ChangeTimeIcon();
+        
+        if (!fiveAMTriggered && CurrentHour >= 5f)
+        {
+            fiveAMTriggered = true;
+            StartCoroutine(PlayDayPopUpTransition());
+        }
+
         if (CurrentHour >= endHour)
         {
             EndDay();
         }
+    }
+
+    public System.Collections.IEnumerator PlayDayPopUpTransition(){
+        Debug.Log("TRIYING TO PLYA THE ANIMATION");
+        
+        if (TextToBeShown != null){
+            TextToBeShown.EntranceAnimation();
+            yield return new WaitForSeconds(1.6f);
+            TextToBeShown.ExitAnimation();
+        }
+        
+    }
+
+    public void ChangeTimeIcon()
+    {
+         Debug.Log($"Hour: {CurrentHour}");
+        int activeIndex = GetActiveIconIndex();
+         Debug.Log($"Active Index: {activeIndex}");
+
+        for (int i = 0; i < NightIcons.Count; i++)
+        {
+            if (NightIcons[i] != null)
+                NightIcons[i].enabled = (i == activeIndex);
+        }
+    }
+
+    private int GetActiveIconIndex()
+    {
+        if (CurrentHour >= 5f && CurrentHour < 7f)
+            return 0; // Sunrise
+        else if (CurrentHour >= 7f && CurrentHour < 17f)
+            return 1; // Morning/Day
+        else if (CurrentHour >= 17f && CurrentHour < 19f)
+            return 0; // Sunset
+        else
+            return 3; // Night
+    }
+
+    public string GetFormattedTime()
+    {
+        int hours = Mathf.FloorToInt(CurrentHour);
+        int minutes = Mathf.FloorToInt((CurrentHour - hours) * 60f);
+        return $"{hours:00}:{minutes:00}";
     }
 
     void EndDay()
