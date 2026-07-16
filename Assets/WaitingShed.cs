@@ -2,5 +2,6 @@ using UnityEngine;
 
 public class WaitingShed : MonoBehaviour
 {
-   public RoadNode roadNode;
+    public RoadSegment road;
+    public float t;      // 0-1 position along the spline
 }
