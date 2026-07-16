@@ -1,5 +1,6 @@
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class DistrictBuilding : MonoBehaviour
 {
@@ -163,10 +164,13 @@ public class DistrictBuilding : MonoBehaviour
 
     void GameOver()
     {
-        Debug.Log("GAME OVER! A building was left without a shed.");
-        
+        // SceneManager.LoadScene("Main Menu");
         GameOverPopupManager.ShowPopup();
         GameOverPanel.EntranceAnimation();
+        Debug.Log("GAME OVER! A building was left without a shed.");
+        
+        // GameOverPopupManager.ShowPopup();
+        // GameOverPanel.EntranceAnimation();
         // Time.timeScale = 0f;
 
         // // GameOverPanel.ShowPopup();
