@@ -1,31 +1,38 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
+using System.Collections;
 using System.Collections.Generic;
 
 public class TimeManager : MonoBehaviour
 {
     public static TimeManager Instance;
 
+    [Header("UI")]
+    [Tooltip("Drag your on-screen UI Text here")]
+    public TextMeshProUGUI clockText;
+
     [Header("Time")]
-    public float dayLength = 720f;      // 12 real minutes
+    public float dayLength = 180f;
     public float startHour = 5f;
     public float endHour = 22f;
 
+    [Header("Inventory & Progression")]
+    public int availableJeepneys = 2;
+    public int currentDay = 1;
+
+    [Header("Day / Night UI")]
+    public List<Image> NightIcons = new List<Image>();
+    public UIAutoAnimation TextToBeShown;
+
     public float CurrentHour { get; private set; }
 
-    public float HourToNormalized(float hour)
-    {
-        return Mathf.InverseLerp(startHour, endHour, hour);
-    }
+    private float timer;
+    private float demandTimer;
 
-    // For UI ***
-    public List<Image> NightIcons = new List<Image>();
-    public UIAutoAnimation TextToBeShown; 
     private bool fiveAMTriggered = false;
 
-    // ****
-
-    private float timer;
+    private List<DistrictBuilding> allBuildings = new List<DistrictBuilding>();
 
     private void Awake()
     {
@@ -37,6 +44,15 @@ public class TimeManager : MonoBehaviour
 
     void Update()
     {
+        HandleTimeProgression();
+        HandleBuildingDemands();
+        UpdateUI();
+    }
+
+    #region Time
+
+    void HandleTimeProgression()
+    {
         timer += Time.deltaTime;
 
         float t = Mathf.Clamp01(timer / dayLength);
@@ -44,7 +60,7 @@ public class TimeManager : MonoBehaviour
         CurrentHour = Mathf.Lerp(startHour, endHour, t);
 
         ChangeTimeIcon();
-        
+
         if (!fiveAMTriggered && CurrentHour >= 5f)
         {
             fiveAMTriggered = true;
@@ -58,22 +74,92 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-    public System.Collections.IEnumerator PlayDayPopUpTransition(){
-        Debug.Log("TRIYING TO PLYA THE ANIMATION");
-        
-        if (TextToBeShown != null){
-            TextToBeShown.EntranceAnimation();
-            yield return new WaitForSeconds(1.6f);
-            TextToBeShown.ExitAnimation();
-        }
-        
+    public float HourToNormalized(float hour)
+    {
+        return Mathf.InverseLerp(startHour, endHour, hour);
     }
 
-    public void ChangeTimeIcon()
+    public float NormalizedTime()
     {
-         Debug.Log($"Hour: {CurrentHour}");
+        return Mathf.InverseLerp(startHour, endHour, CurrentHour);
+    }
+
+    public string GetFormattedTime()
+    {
+        int hour = Mathf.FloorToInt(CurrentHour);
+        int minutes = Mathf.FloorToInt((CurrentHour - hour) * 60f);
+
+        return $"{hour:00}:{minutes:00}";
+    }
+
+    #endregion
+
+    #region Buildings
+
+    public void RegisterBuilding(DistrictBuilding building)
+    {
+        if (!allBuildings.Contains(building))
+            allBuildings.Add(building);
+    }
+
+    void HandleBuildingDemands()
+    {
+        demandTimer += Time.deltaTime;
+
+        float timeBetweenDemands = Mathf.Max(8f, 25f - (currentDay * 3f));
+
+        if (demandTimer >= timeBetweenDemands)
+        {
+            demandTimer = 0f;
+            ActivateRandomBuilding();
+        }
+    }
+
+    void ActivateRandomBuilding()
+    {
+        List<DistrictBuilding> chillBuildings = new List<DistrictBuilding>();
+
+        foreach (DistrictBuilding building in allBuildings)
+        {
+            if (!building.isDemandingShed)
+                chillBuildings.Add(building);
+        }
+
+        if (chillBuildings.Count == 0)
+            return;
+
+        int buildingsToActivate = Mathf.CeilToInt(currentDay / 2f);
+        buildingsToActivate = Mathf.Min(buildingsToActivate, chillBuildings.Count);
+
+        for (int i = 0; i < buildingsToActivate; i++)
+        {
+            int randomIndex = Random.Range(0, chillBuildings.Count);
+
+            chillBuildings[randomIndex].ActivateDemand();
+
+            chillBuildings.RemoveAt(randomIndex);
+        }
+    }
+
+    #endregion
+
+    #region Day Night UI
+
+    IEnumerator PlayDayPopUpTransition()
+    {
+        if (TextToBeShown != null)
+        {
+            TextToBeShown.EntranceAnimation();
+
+            yield return new WaitForSeconds(1.6f);
+
+            TextToBeShown.ExitAnimation();
+        }
+    }
+
+    void ChangeTimeIcon()
+    {
         int activeIndex = GetActiveIconIndex();
-         Debug.Log($"Active Index: {activeIndex}");
 
         for (int i = 0; i < NightIcons.Count; i++)
         {
@@ -82,27 +168,60 @@ public class TimeManager : MonoBehaviour
         }
     }
 
-    private int GetActiveIconIndex()
+    int GetActiveIconIndex()
     {
         if (CurrentHour >= 5f && CurrentHour < 7f)
-            return 0; // Sunrise
-        else if (CurrentHour >= 7f && CurrentHour < 17f)
-            return 1; // Morning/Day
-        else if (CurrentHour >= 17f && CurrentHour < 19f)
-            return 0; // Sunset
-        else
-            return 3; // Night
+            return 0;   // Sunrise
+
+        if (CurrentHour >= 7f && CurrentHour < 17f)
+            return 1;   // Day
+
+        if (CurrentHour >= 17f && CurrentHour < 19f)
+            return 2;   // Sunset
+
+        return 3;       // Night
     }
 
+    #endregion
 
+    #region UI
+
+    void UpdateUI()
+    {
+        if (clockText == null)
+            return;
+
+        int hour = Mathf.FloorToInt(CurrentHour);
+        int minutes = Mathf.FloorToInt((CurrentHour - hour) * 60f);
+
+        clockText.text = $"Day {currentDay} | {hour:00}:{minutes:00}";
+    }
+
+    #endregion
+
+    #region Gameplay
 
     void EndDay()
     {
-        Debug.Log("Day Ended");
+        Debug.Log($"Day {currentDay} Ended. Rewarding 1 Jeepney!");
+
+        availableJeepneys++;
+        currentDay++;
+
+        timer = 0f;
+        demandTimer = 0f;
+
+        fiveAMTriggered = false;
     }
 
-    public float NormalizedTime()
+    public bool TryUseJeepney()
     {
-        return Mathf.InverseLerp(startHour, endHour, CurrentHour);
+        if (availableJeepneys <= 0)
+            return false;
+
+        availableJeepneys--;
+        return true;
     }
+
+    #endregion
 }
